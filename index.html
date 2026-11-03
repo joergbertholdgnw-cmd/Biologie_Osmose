@@ -1,0 +1,587 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mission Kirschernte</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Nunito+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fbf6ee; --paper:#ffffff; --ink:#1f2a37; --muted:#5b6675; --line:#e6dccb;
+  --cherry:#b3122e; --cherry2:#e0314f; --leaf:#2f7d4f; --leaf2:#e4f2e8; --sky:#1e6fa8; --sky2:#e3f0fa;
+  --sun:#f2b632; --sun2:#fff4d6; --vio:#7b3fa0; --vio2:#f1e8f8; --bad:#c2410c;
+  --head:'Fraunces',Georgia,serif; --body:'Nunito Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.55;min-height:100vh}
+button{font:inherit;cursor:pointer}
+.wrap{max-width:980px;margin:0 auto;padding:0 16px}
+h1,h2,h3{font-family:var(--head);line-height:1.2;margin:.2em 0 .45em}
+h1{font-size:clamp(32px,6vw,54px);color:var(--cherry)}
+h2{font-size:clamp(22px,3.4vw,28px)}
+h3{font-size:19px}
+.muted{color:var(--muted)}
+.mini{font-size:14px;color:var(--muted)}
+/* Kopfleiste */
+.hud{position:sticky;top:0;z-index:20;background:rgba(251,246,238,.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+.hud .wrap{display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding-top:8px;padding-bottom:8px}
+.brand{font-family:var(--head);font-weight:800;color:var(--cherry);font-size:18px}
+.timer{font-variant-numeric:tabular-nums;font-weight:800;font-size:20px;padding:2px 12px;border:2px solid var(--line);border-radius:10px;background:#fff}
+.timer.low{border-color:var(--sun);color:#8a5a00}
+.timer.over{border-color:var(--bad);color:var(--bad)}
+.slots{display:flex;gap:4px;flex-wrap:wrap}
+.slot{width:26px;height:32px;border:2px solid var(--line);border-radius:7px;display:grid;place-items:center;font-weight:800;color:#c9bca6;background:#fff;font-size:15px}
+.slot.got{background:var(--cherry);border-color:var(--cherry);color:#fff}
+.slot.cur{border-color:var(--cherry2)}
+.slot.gap{margin-left:8px}
+.sp{flex:1}
+/* Karten */
+.card{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin:16px 0;box-shadow:0 4px 14px rgba(80,50,20,.06)}
+.story{border-left:5px solid var(--cherry);background:#fff1f2;padding:12px 16px;border-radius:0 12px 12px 0;font-style:italic}
+.btn{background:var(--cherry);color:#fff;border:0;border-radius:12px;padding:11px 20px;font-weight:800;box-shadow:0 4px 12px rgba(179,18,46,.25)}
+.btn:hover{background:#9b0f27}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.ghost{background:#fff;color:var(--ink);border:2px solid var(--line);box-shadow:none}
+.btn.hint{background:var(--sun2);color:#7a4d00;border:2px solid var(--sun);box-shadow:none}
+.btn.small{padding:6px 12px;font-size:15px;border-radius:9px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.tag{display:inline-block;font-size:12px;font-weight:800;padding:2px 9px;border-radius:99px;margin-right:6px;letter-spacing:.03em}
+.afb1{background:var(--leaf2);color:var(--leaf)}.afb2{background:var(--sky2);color:var(--sky)}.afb3{background:var(--vio2);color:var(--vio)}
+.part{display:inline-block;font-size:12px;font-weight:800;padding:2px 9px;border-radius:99px;background:#f3ece0;color:#6b5a3e}
+select,input[type=text],input[type=number],textarea{font:inherit;color:var(--ink);background:#fff;border:2px solid var(--line);border-radius:10px;padding:6px 10px;max-width:100%}
+select:focus,input:focus,textarea:focus{outline:3px solid #f9c2cc;border-color:var(--cherry2)}
+input[type=number]{width:90px}
+textarea{width:100%;min-height:110px;resize:vertical}
+/* Infokarte */
+.info{background:var(--sky2);border:2px solid #bcdcf2;border-radius:14px;padding:4px 16px 10px;margin:14px 0}
+.info>summary{cursor:pointer;font-weight:800;color:var(--sky);padding:8px 0;list-style:none}
+.info>summary::before{content:"📘 "}
+.info .book{font-size:13px;color:var(--sky);font-weight:700}
+.word{display:inline-block;background:#fff;border:2px solid #bcdcf2;border-radius:10px;padding:6px 10px;margin:4px 6px 4px 0}
+.word b{color:var(--sky)}
+.gloss{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;margin:8px 0}
+.gloss div{background:#fff;border-radius:10px;padding:8px 12px;border:1px solid #cfe4f5}
+.gloss b{display:block;color:var(--sky)}
+.svgbox{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px;margin:10px 0;text-align:center}
+.svgbox svg{width:100%;height:auto;max-height:340px}
+.svgbox.micros{display:flex;gap:8px;justify-content:center}
+.svgbox.micros svg{width:32%;max-width:200px}
+.sheet .pics{display:flex;gap:16px;align-items:flex-start}
+.sheet .pics svg{width:150px;height:auto}
+.svgbox text{font-family:var(--body)}
+/* Aufgaben */
+.task{margin:16px 0;padding-top:12px;border-top:1px dashed var(--line)}
+.q{font-weight:700;margin-bottom:8px}
+.op{color:var(--cherry);font-weight:800}
+.deflist{display:grid;gap:6px;margin:6px 0 10px}
+.deflist div{background:#faf6ef;border-radius:10px;padding:7px 12px}
+.deflist b{display:inline-block;width:26px;color:var(--cherry)}
+.pair{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid #f1eadf;flex-wrap:wrap}
+.tf{display:grid;grid-template-columns:28px 1fr auto;gap:10px;align-items:center;padding:7px 0;border-bottom:1px solid #f1eadf}
+.tf .n{font-weight:800;color:var(--muted)}
+.seg{display:inline-flex;border:2px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{border:0;background:#fff;padding:5px 14px;font-weight:800;color:var(--muted)}
+.seg button+button{border-left:2px solid var(--line)}
+.seg button.on{background:var(--cherry);color:#fff}
+.radios{display:grid;gap:6px}
+.radios label{display:flex;gap:8px;align-items:flex-start;background:#faf6ef;border-radius:10px;padding:8px 12px;cursor:pointer;border:2px solid transparent}
+.radios label:has(input:checked){border-color:var(--cherry2);background:#fff1f2}
+.radios input{margin-top:5px}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.mcard{background:#faf6ef;border-radius:12px;padding:10px 12px}
+table.calc{border-collapse:collapse;width:100%;margin:6px 0}
+table.calc th,table.calc td{border:1px solid var(--line);padding:6px 8px;text-align:center}
+table.calc th{background:#faf6ef}
+.feedback{margin-top:12px;padding:10px 14px;border-radius:10px;font-weight:700;display:none}
+.feedback.show{display:block}
+.feedback.ok{background:var(--leaf2);color:var(--leaf)}
+.feedback.no{background:#fff1e6;color:var(--bad)}
+.hintbox{background:var(--sun2);border:2px solid var(--sun);border-radius:12px;padding:10px 14px;margin-top:10px}
+.merke{background:var(--leaf2);border:2px solid #a9d6b8;border-radius:14px;padding:12px 16px;margin-top:14px}
+.merke h4{margin:0 0 6px;color:var(--leaf)}
+.letter{display:inline-grid;place-items:center;width:54px;height:62px;border-radius:12px;background:var(--cherry);color:#fff;font-size:34px;font-weight:800;font-family:var(--head);margin-right:12px}
+.bridge{background:linear-gradient(135deg,#fff1f2,#fff4d6);border:2px solid #f6c3cc}
+/* Start */
+.hero{text-align:center;padding:26px 0 6px}
+.hero .kicker{letter-spacing:.2em;font-weight:800;color:var(--leaf);font-size:13px;text-transform:uppercase}
+.plan{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.plan div{background:#faf6ef;border-radius:12px;padding:10px 12px}
+.plan b{display:block}
+.lab textarea{min-height:120px}
+.model{background:var(--leaf2);border-radius:10px;padding:10px 12px;margin-top:8px}
+/* Abschluss/Druck */
+.sheet h3{color:var(--cherry);margin-top:18px}
+.sheet table{border-collapse:collapse;width:100%}
+.sheet td,.sheet th{border:1px solid #bbb;padding:8px;text-align:left;vertical-align:top}
+.sheet th{background:#f3ece0}
+.sheet .blank td{height:34px}
+.draw{height:170px;border:1px dashed #999;border-radius:8px}
+.teacher{display:none}
+.teacher.show{display:block}
+.teacher .sol{background:#faf6ef;border-radius:10px;padding:8px 12px;margin:6px 0}
+.footer{padding:20px 0 40px;text-align:center}
+.footer button{background:none;border:0;color:var(--muted);text-decoration:underline;font-size:14px}
+canvas{max-width:100%;height:auto;background:#fff;border-radius:10px;display:block;margin:0 auto}
+.counter{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-top:8px}
+.counter span{background:#faf6ef;border-radius:10px;padding:6px 12px;font-weight:800}
+@media (max-width:600px){body{font-size:16px}.card{padding:14px}.tf{grid-template-columns:22px 1fr}.tf .seg{grid-column:2}}
+@media print{
+  .hud,.footer,.noprint,#view>*:not(.printable){display:none!important}
+  body{background:#fff;font-size:12pt}
+  .card{box-shadow:none;border:0;padding:0}
+  .printable{display:block!important}
+}
+</style>
+</head>
+<body>
+<div class="hud noprint"><div class="wrap">
+  <span class="brand">🍒 Mission Kirschernte</span>
+  <span class="timer" id="timer">45:00</span>
+  <span class="slots" id="slots"></span>
+  <span class="sp"></span>
+  <span class="mini" id="team"></span>
+</div></div>
+<main class="wrap" id="view"></main>
+<div class="wrap footer noprint"><button id="teachBtn">Lehrkraft</button> · <button id="resetBtn">Spiel zurücksetzen</button></div>
+
+<script>
+"use strict";
+const KEY='mission-kirschernte-v1';
+const TOTAL_MIN=45;
+const KEYS={"a1":[3990812130,3990813221,3990814307,3990815398,3990816484],"a2":[3991998066,3991999155,3992000232,3992001321,3992002422,3992003499],"a3":[3993183987,3993185072,3993186159],"b1":[2223345472,1647424297,3453660461,2340751651,1226860908],"b2":[2242417906,448970526,530386548,451338413,2046560739,4178565715,4031139981],"b3":[4264581226,1740443182,1639156292,4032322631,4032323721,4032324809],"b4":[1230168365,2542101158,3076489916,4033508552,4033509626,4033510713,4033511805,4033512892],"b5":[898425540,4034692281,4034693367,4034694460,4034695546,4034696636,4034697741],"c1":[4177657921,1135787921,334777036,3194316,1135894888,198362157],"c2":[4070268877,4070269968,4070271055,4070272155,4070273233,4070274322],"c3":[4071454771,4071455861,4071456935,4071458023]};
+const TEACH_HASH=221252114;
+const TEACH_DATA='PGgzPkFibGF1ZiAoNDUgTWludXRlbiwgUGFydG5lcmFyYmVpdCk8L2gzPgo8cD5TdGFydCB1bmQgRWluZsO8aHJ1bmcgMiBtaW4gwrcgVGVpbCAxIFdpZWRlcmhvbHVuZyAoU3RhdGlvbmVuIDHigJMzKSBjYS4gOSBtaW4gwrcgVGVpbCAyIG5ldWUgSW5oYWx0ZSAoU3RhdGlvbmVuIDTigJM4KSBjYS4gMjIgbWluIMK3IFRlaWwgMyBWZXJzdWNoc3ZvcmJlcmVpdHVuZyAoU3RhdGlvbmVuIDnigJMxMSkgY2EuIDEwIG1pbiDCtyBMw7ZzdW5nc3dvcnQsIEVya2zDpHJ0ZXh0IHVuZCBWZXJzdWNoc3BsYW4gMiBtaW4uIEzDtnN1bmdzd29ydDogPGI+UkVHRU5TQ0hVVFo8L2I+LiBTY2huZWxsZSBUZWFtcyBzY2hyZWliZW4gYW0gRW5kZSBkZW4gRXJrbMOkcnRleHQgZsO8ciBkaWUgT2JzdGLDpHVlcmluLiBMYW5nc2FtZXJlIFRlYW1zIMO8YmVybmVobWVuIGRlbiBWZXJzdWNoc3BsYW4gYXVzIGRlbSBNZXJrZS1LYXN0ZW4gdm9uIFN0YXRpb24gOSBpbnMgSGVmdC48L3A+CjxwPkRlciBGb3J0c2Nocml0dCB3aXJkIGltIEJyb3dzZXIgZ2VzcGVpY2hlcnQgKE5ldWxhZGVuIHNjaGFkZXQgbmljaHQpLiBGw7xyIEdydXBwZW4sIGRpZSBow6RuZ2VuLCBrYW5uIMO8YmVyIOKAnlp1IFN0YXRpb24gc3ByaW5nZW7igJwgd2VpdGVyZ2VzY2hhbHRldCB3ZXJkZW4uIE5hY2ggZHJlaSBmYWxzY2hlbiBQcsO8ZnZlcnN1Y2hlbiBzcGVycnQgZWluZSBTdGF0aW9uIDIwIFNla3VuZGVuLCBkYW1pdCBuaWNodCBnZXJhdGVuIHdpcmQuPC9wPgoKPGgzPkzDtnN1bmdlbjwvaDM+CjxkaXYgY2xhc3M9InNvbCI+PGI+MSBCZWdyaWZmZSAoUik6PC9iPiBEaWZmdXNpb24gQyDCtyBCcm93bnNjaGUgTW9sZWt1bGFyYmV3ZWd1bmcgRSDCtyBLb256ZW50cmF0aW9uc2dlZsOkbGxlIEIgwrcgc2VtaXBlcm1lYWJsZSBNZW1icmFuIEQgwrcgT3Ntb3NlIEE8L2Rpdj4KPGRpdiBjbGFzcz0ic29sIj48Yj4yIFJpY2h0aWcvZmFsc2NoIChFKTo8L2I+IFIgUiBGIEYgUiBGPC9kaXY+CjxkaXYgY2xhc3M9InNvbCI+PGI+MyBXYXNzZXJyaWNodHVuZyAoRyk6PC9iPiBSb2hyIDEgbmFjaCByZWNodHMgwrcgUm9ociAyIGdsZWljaCB2aWVsIGluIGJlaWRlIFJpY2h0dW5nZW4gwrcgUm9ociAzIG5hY2ggbGlua3M8L2Rpdj4KPGRpdiBjbGFzcz0ic29sIj48Yj40IEh5cG8vaHlwZXIvaXNvIChFKTo8L2I+IGRlc3QuIFdhc3NlciBoeXBvdG9uIMK3IDUgJSBoeXBlcnRvbiDCtyAwLDkgJSBpc290b24gwrcgTGVpdHVuZ3N3YXNzZXIgaHlwb3RvbiDCtyBNZWVyd2Fzc2VyIGh5cGVydG9uPC9kaXY+CjxkaXYgY2xhc3M9InNvbCI+PGI+NSBOZXR0b3N0cm9tIChOKTo8L2I+IFplbGxlIDE6IDEyLCBOZXR0b2VpbnN0cm9tIMK3IFplbGxlIDI6IDEyLCBOZXR0b2F1c3N0cm9tIMK3IFplbGxlIDM6IDAsIEZsaWXDn2dsZWljaGdld2ljaHQgwrcgQXVzc2FnZTogZmFsc2NoPC9kaXY+CjxkaXYgY2xhc3M9InNvbCI+PGI+NiBSb3RlIEJsdXR6ZWxsZW4gKFMpOjwvYj4gWCBoeXBlcnRvbiDCtyBZIGlzb3RvbiDCtyBaIGh5cG90b24gwrcgSW5mdXNpb24gQiDCtyBSZWd1bGF0aW9uIEMgwrcgSG9tw7Zvc3Rhc2UgQjwvZGl2Pgo8ZGl2IGNsYXNzPSJzb2wiPjxiPjcgVHVyZ29yIChDKTo8L2I+IDEgWmVsbHdhbmQgwrcgMiBaZWxsbWVtYnJhbiDCtyAzIFZha3VvbGUgwrcgQiDCtyBSZWloZW5mb2xnZSBkZXIgYW5nZXplaWd0ZW4gU8OkdHplOiAzLCAxLCA0LCAyPC9kaXY+CjxkaXYgY2xhc3M9InNvbCI+PGI+OCBLaXJzY2hlbiAoSCk6PC9iPiBoeXBvdG9uIMK3IFJlaWhlbmZvbGdlIGRlciBhbmdlemVpZ3RlbiBTw6R0emU6IDQsIDEsIDUsIDIsIDMgwrcgTWHDn25haG1lIEM8L2Rpdj4KPGRpdiBjbGFzcz0ic29sIj48Yj45IEthcnRvZmZlbCAoVSk6PC9iPiBBIGh5cG90b24sIE1hc3NlIG5pbW10IHp1LCBmZXN0ZXIgwrcgQiBoeXBlcnRvbiwgTWFzc2UgbmltbXQgYWIsIHdlaWNoZXI8L2Rpdj4KPGRpdiBjbGFzcz0ic29sIj48Yj4xMCBGYWlyZXIgVmVyc3VjaCAoVCk6PC9iPiBMaWVnZWRhdWVyIGdsZWljaCDCtyBNYXNzZSBnZW1lc3NlbiDCtyBHcsO2w59lIGdsZWljaCDCtyBTYWx6a29uemVudHJhdGlvbiB2ZXLDpG5kZXJ0IMK3IEZsw7xzc2lna2VpdHNtZW5nZSBnbGVpY2ggwrcgVGVtcGVyYXR1ciBnbGVpY2g8L2Rpdj4KPGRpdiBjbGFzcz0ic29sIj48Yj4xMSBad2llYmVsIChaKTo8L2I+IFdhc3NlciBCaWxkIFEgwrcgU2FsemzDtnN1bmcgQmlsZCBQIMK3IFp3aXNjaGVucmF1bSBCIChBdcOfZW5sw7ZzdW5nKSDCtyBXYXNzZXJ6dWdhYmUgQSAoRGVwbGFzbW9seXNlKTwvZGl2PgoKPGgzPkRpZGFrdGlzY2hlIEhpbndlaXNlPC9oMz4KPHVsPgo8bGk+PGI+VGVpbCAxPC9iPiB3aWVkZXJob2x0IGRpZSBJbmhhbHRlIGRlcyBlcnN0ZW4gRXNjYXBlLVNwaWVscyBhdWYgQUZCIEkuIERvcnQgaGVpw590IGRpZSBNZW1icmFuIOKAnnNlbWlwZXJtZWFiZWzigJwuIFN0YXRpb24gNCBmw7xocnQgenVzw6R0emxpY2ggZGFzIGdsZWljaGJlZGV1dGVuZCB2ZXJ3ZW5kZXRlIEZhY2h3b3J0IOKAnnNlbGVrdGl2IHBlcm1lYWJlbOKAnCBlaW4uPC9saT4KPGxpPjxiPlRlaWwgMjwvYj4gZXJhcmJlaXRldCBkaWUgbmV1ZW4gSW5oYWx0ZSBpbiBrbGVpbmVuIFNjaHJpdHRlbi4gSmVkZSBTdGF0aW9uIGhhdCBlaW5lIEluZm9rYXJ0ZSBtaXQgQmVncmlmZnNlcmtsw6RydW5nLCBlaW4gQmlsZCB1bmQgendlaSBnZXN0dWZ0ZSBUaXBwcy4gSHlwby0sIGlzby0gdW5kIGh5cGVydG9uIHdlcmRlbiBkdXJjaGdlaGVuZCDDvGJlciBkaWUgPGI+S29uemVudHJhdGlvbjwvYj4gZ2Vsw7ZzdGVyIFRlaWxjaGVuIGltIFZlcmdsZWljaCB6dW0gWmVsbGlubmVyZW4gZGVmaW5pZXJ0LCBuaWNodCDDvGJlciBkaWUgTWVuZ2UuPC9saT4KPGxpPjxiPlZvbHVtZW5yZWd1bGF0aW9uIGRlciBFcnl0aHJvenl0ZW46PC9iPiBEaWUgSW5mb2thcnRlIGJlc2NocmVpYnQsIGRhc3Mgc2ljaCB6dXPDpHR6bGljaGUgSW9uZW5rYW7DpGxlIMO2ZmZuZW4gdW5kIElvbmVuICh2b3IgYWxsZW0gS2FsaXVtLSB1bmQgQ2hsb3JpZC1Jb25lbikgcGFzc2l2IGVudGxhbmcgaWhyZXMgS29uemVudHJhdGlvbnNnZWbDpGxsZXMgYXVzc3Ryw7ZtZW4uIE1hbmNoZSBMZWhyYnVjaHRleHRlIHNwcmVjaGVuIGhpZXIgdm9uIEthbsOkbGVuLCBkaWUgSW9uZW4g4oCeYWt0aXbigJwgdHJhbnNwb3J0aWVyZW4uIERhcyBpc3QgZmFjaGxpY2ggdW5nZW5hdTogS2Fuw6RsZSBhcmJlaXRlbiBwYXNzaXY7IEVuZXJnaWUgd2lyZCBudXIgaW5kaXJla3QgYmVuw7Z0aWd0LCB3ZWlsIGRpZSBOYXRyaXVtLUthbGl1bS1QdW1wZSBkYXMgR2Vmw6RsbGUgenV2b3IgdW50ZXIgQVRQLVZlcmJyYXVjaCBhdWZiYXV0LjwvbGk+CjxsaT48Yj5UdXJnb3I6PC9iPiBEYXMgRmxpZcOfZ2xlaWNoZ2V3aWNodCBzdGVsbHQgc2ljaCBpbiBQZmxhbnplbnplbGxlbiBlaW4sIG9id29obCBpbm5lbiB3ZWl0ZXJoaW4gZWluZSBow7ZoZXJlIEtvbnplbnRyYXRpb24gaGVycnNjaHQsIHdlaWwgZGVyIFdhbmRkcnVjayBkZW0gRWluc3Ryb20gZW50Z2VnZW53aXJrdC4gRGFzIFNwaWVsIGZvcm11bGllcnQgZGFzIG9obmUgZGVuIEJlZ3JpZmYgV2Fzc2VycG90ZW56aWFsLjwvbGk+CjxsaT48Yj5QbGFzbW9seXNlPC9iPiB3aXJkIGVyc3QgaW4gU3RhdGlvbiAxMSBlaW5nZWbDvGhydCwgZGlyZWt0IHZvciBkZW0gTWlrcm9za29waWVydmVyc3VjaC4gRGVyIFJhdW0gendpc2NoZW4gWmVsbHdhbmQgdW5kIFByb3RvcGxhc3QgZW50aMOkbHQgZGllIEF1w59lbmzDtnN1bmcsIGRhIGRpZSBaZWxsd2FuZCBmcmVpIGR1cmNobMOkc3NpZyBpc3QuPC9saT4KPGxpPjxiPktpcnNjaGVuLUtvbnRleHQ6PC9iPiBEaWUgRWluc3RpZWdzZnJhZ2Ugd2lyZCBpbiBTdGF0aW9uIDggYmVhbnR3b3J0ZXQuIEFtIEVuZGUgZm9sZ3QgZWluIGZyZWllciBFcmtsw6RydGV4dCBtaXQgTXVzdGVybMO2c3VuZyAoQUZCIElJKS4gRmFjaGxpY2ggdmVyZWluZmFjaHQ6IFdhc3NlciBnZWxhbmd0IG5pY2h0IG51ciDDvGJlciBkaWUgSGF1dCwgc29uZGVybiBhdWNoIMO8YmVyIGRpZSBMZWl0YmFobmVuIGluIGRpZSBGcnVjaHQ7IGRpZSBSaXNzYmlsZHVuZyBow6RuZ3QgenVkZW0gdm9uIGRlciBFbGFzdGl6aXTDpHQgZGVyIEhhdXQgYWIuPC9saT4KPGxpPjxiPlRlaWwgMzwvYj4gYmVyZWl0ZXQgZGllIFZlcnN1Y2hlIGRlciB6d2VpdGVuIFN0dW5kZSB2b3I6IEh5cG90aGVzZW4gKEthcnRvZmZlbCksIFZhcmlhYmxlbmtvbnRyb2xsZSB1bmQgZWluZSBWb3JoZXJzYWdlIGbDvHIgZGllIFBsYXNtb2x5c2UgYW4gcm90ZXIgWndpZWJlbC4gRGVyIGF1c2RydWNrYmFyZSBWZXJzdWNoc3BsYW4gZW50aMOkbHQgZGllIEh5cG90aGVzZW4gZGVyIEdydXBwZSwgTWF0ZXJpYWwsIER1cmNoZsO8aHJ1bmcsIE1lc3N0YWJlbGxlIHVuZCBaZWljaGVuZmVsZGVyLjwvbGk+CjwvdWw+CjxoMz5Wb3JiZXJlaXR1bmcgU3R1bmRlIDI8L2gzPgo8dWw+CjxsaT5LYXJ0b2ZmZWxuIChmZXN0a29jaGVuZCksIE1lc3NlciB1bmQgU2NobmVpZGVicmV0dGVyLCBXYWFnZW4gbWl0IDAsMDEgZyBBdWZsw7ZzdW5nLCBkZXN0aWxsaWVydGVzIFdhc3NlciwgMTAtcHJvemVudGlnZSBOYUNsLUzDtnN1bmcsIEvDvGNoZW5wYXBpZXIuIFRpcHA6IFN0w6RiY2hlbiBzY2hvbiB6dSBCZWdpbm4gZGVyIFN0dW5kZSBhbnNldHplbiwgZGFtaXQgMzAgTWludXRlbiBMaWVnZXplaXQgbcO2Z2xpY2ggc2luZC4gQWx0ZXJuYXRpdiBlaW5lbiBLb3JrYm9ocmVyIHZlcndlbmRlbiwgZGFzIGVyZ2lidCBnbGVpY2ggZ3Jvw59lIFp5bGluZGVyLjwvbGk+CjxsaT5Sb3RlIEvDvGNoZW56d2llYmVsLCBNaWtyb3Nrb3BlLCBPYmpla3R0csOkZ2VyLCBEZWNrZ2zDpHNjaGVuLCBQaW56ZXR0ZSwgUGlwZXR0ZW4sIEZpbHRlcnBhcGllciwgZXR3YSAxMC1wcm96ZW50aWdlIE5hQ2wtTMO2c3VuZy4gRGllIFBsYXNtb2x5c2UgaXN0IG5hY2ggMuKAkzUgTWludXRlbiBndXQgc2ljaHRiYXIuIEVpbmUgU2FjY2hhcm9zZWzDtnN1bmcgKGNhLiAxIG1vbC9sKSBmdW5rdGlvbmllcnQgZWJlbmZhbGxzLjwvbGk+CjxsaT5TaWNoZXJoZWl0OiBVbWdhbmcgbWl0IE1lc3Nlcm4gdW5kIFJhc2llcmtsaW5nZW4gYmVzcHJlY2hlbi4gRGllIFNhbHpsw7ZzdW5nIGlzdCB1bmdlZsOkaHJsaWNoLCBhYmVyIG5pY2h0IGluIGRpZSBBdWdlbiByZWliZW4uPC9saT4KPC91bD4K';
+function h(s){let x=5381;for(const c of s){x=((x<<5)+x+c.codePointAt(0))|0}return x>>>0}
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const normNum=v=>{const n=parseFloat(String(v).replace(',','.').replace(/[^0-9.\-]/g,''));return isNaN(n)?'x':n.toFixed(2)};
+
+function fresh(){return{team:'',started:null,finished:null,cur:0,solved:{},hints:{},fails:{},lock:{},notes:{},compared:{},vals:{}}}
+let S=fresh();
+try{const raw=localStorage.getItem(KEY);if(raw)S=Object.assign(fresh(),JSON.parse(raw))}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+
+/* ---------- Bausteine für Aufgaben ---------- */
+const sel=(i,opts)=>`<select data-i="${i}"><option value="">– wählen –</option>${opts.map(([v,t])=>`<option value="${v}">${t}</option>`).join('')}</select>`;
+const mc=(i,opts)=>`<div class="radios" data-i="${i}">${opts.map(([v,t])=>`<label><input type="radio" name="q${i}" value="${v}"><span><b>${v}</b> ${t}</span></label>`).join('')}</div>`;
+const seg=(i,opts)=>`<span class="seg" data-i="${i}">${opts.map(([v,t])=>`<button type="button" data-v="${v}">${t}</button>`).join('')}</span>`;
+const num=i=>`<input type="number" inputmode="numeric" data-i="${i}" placeholder="?">`;
+const TONI=[['hypo','hypoton'],['iso','isoton'],['hyper','hyperton']];
+
+function getVal(root,i){
+  const el=$(`[data-i="${i}"]`,root);if(!el)return '';
+  if(el.classList.contains('radios')){const r=$('input:checked',el);return r?r.value:''}
+  if(el.classList.contains('seg'))return el.dataset.val||'';
+  if(el.type==='number')return el.value===''?'':normNum(el.value);
+  return el.value;
+}
+function setVal(root,i,v){
+  const el=$(`[data-i="${i}"]`,root);if(!el||v===''||v==null)return;
+  if(el.classList.contains('radios')){const r=$(`input[value="${v}"]`,el);if(r)r.checked=true;return}
+  if(el.classList.contains('seg')){el.dataset.val=v;$$('button',el).forEach(b=>b.classList.toggle('on',b.dataset.v===v));return}
+  el.value=el.type==='number'?parseFloat(v):v;
+}
+
+/* ---------- Zeichnungen ---------- */
+function rng(seed){let s=seed;return()=>{s=(s*9301+49297)%233280;return s/233280}}
+function dots(n,x0,x1,y0,y1,color,seed,r=4){const R=rng(seed);let o='';for(let k=0;k<n;k++)o+=`<circle cx="${(x0+R()*(x1-x0)).toFixed(1)}" cy="${(y0+R()*(y1-y0)).toFixed(1)}" r="${r}" fill="${color}"/>`;return o}
+function dotsEx(n,x0,x1,y0,y1,color,seed,cx,cy,rr){const R=rng(seed);let o='',k=0,g=0;while(k<n&&g<2000){g++;const x=x0+R()*(x1-x0),y=y0+R()*(y1-y0);if(Math.hypot(x-cx,y-cy)<rr)continue;o+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4" fill="${color}"/>`;k++}return o}
+function water(n,x0,x1,y0,y1,seed){return dots(n,x0,x1,y0,y1,'#7cc3ea',seed,2.4)}
+// Zwei Kammern mit Membran (A3)
+function chamber(idx,l,r,labL,labR){
+  return `<svg viewBox="0 0 260 170" role="img" aria-label="Zwei Kammern mit Membran">
+   <rect x="10" y="22" width="240" height="120" rx="10" fill="#eef7fd" stroke="#8aa3b5" stroke-width="2"/>
+   ${water(46,16,124,28,136,idx*13+1)}${water(46,136,244,28,136,idx*17+2)}
+   ${dots(l,20,118,34,132,'#f08a24',idx*7+3)}${dots(r,142,240,34,132,'#f08a24',idx*11+5)}
+   <line x1="130" y1="22" x2="130" y2="142" stroke="#c0392b" stroke-width="3" stroke-dasharray="7 5"/>
+   <text x="70" y="15" text-anchor="middle" font-size="12" fill="#1f2a37" font-weight="700">${labL}</text>
+   <text x="190" y="15" text-anchor="middle" font-size="12" fill="#1f2a37" font-weight="700">${labR}</text>
+   <text x="130" y="160" text-anchor="middle" font-size="11" fill="#5b6675">Membran (nur für Wasser durchlässig)</text>
+  </svg>`;
+}
+// Pflanzenzelle: state turgor | normal | plasmo
+function plantCell(state,x,y,w,hgt,opt={}){
+  const vio=opt.red?'#a2307a':'#8fc6ec', vioS=opt.red?'#6d1b52':'#3b7fae';
+  const P0={turgor:{m:6,v:16,r:10},normal:{m:6,v:22,r:12},plasmo:{m:22,v:30,r:26}}[state];
+  const f=Math.min(1,Math.min(w,hgt)/120);const P={m:Math.max(3,P0.m*f),v:Math.max(6,P0.v*f),r:P0.r*f};
+  const out=opt.outside||'none';
+  let s=`<g>`;
+  s+=`<rect x="${x}" y="${y}" width="${w}" height="${hgt}" rx="4" fill="${out}" stroke="#9a6b2f" stroke-width="6"/>`;
+  s+=`<rect x="${x+P.m}" y="${y+P.m}" width="${w-2*P.m}" height="${hgt-2*P.m}" rx="${P.r}" fill="#d9efcf" stroke="#2f7d4f" stroke-width="2"/>`;
+  s+=`<rect x="${x+P.v}" y="${y+P.v}" width="${w-2*P.v}" height="${hgt-2*P.v}" rx="${P.r+4}" fill="${vio}" fill-opacity="${state==='plasmo'?.95:.75}" stroke="${vioS}" stroke-width="1.5"/>`;
+  s+=`<circle cx="${x+P.m+11}" cy="${y+P.m+11}" r="6" fill="#6b8f3a" stroke="#3d5a1d"/>`;
+  return s+`</g>`;
+}
+// Mikroskopbild ohne clipPath (eigenes SVG, weißer Ring deckt Zellen außerhalb des Sehfelds ab)
+function micro(lab,state,size){
+  const cx=100;let s=`<svg viewBox="0 0 200 215" role="img" aria-label="${lab}"${size?` width="${size}"`:''}><circle cx="${cx}" cy="100" r="82" fill="#fff"/>`;
+  for(let r=0;r<3;r++)for(let c=0;c<3;c++){const x=cx-110+c*74,y=18+r*58;
+    if(state==='burst')s+=`<rect x="${x}" y="${y}" width="66" height="50" fill="none" stroke="#9a6b2f" stroke-width="4" stroke-dasharray="${(r+c)%2?'14 6':'40 8'}"/>${dots(4,x+6,x+60,y+6,y+44,'#a2307a',x+y,3)}`;
+    else s+=plantCell(state,x,y,66,50,{red:true})}
+  return s+`<circle cx="${cx}" cy="100" r="150" fill="none" stroke="#fff" stroke-width="136"/><circle cx="${cx}" cy="100" r="82" fill="none" stroke="#1f2a37" stroke-width="3"/><text x="${cx}" y="205" text-anchor="middle" font-size="16" font-weight="800" fill="#1f2a37">${lab}</text></svg>`;
+}
+function eryth(kind,cx,cy){
+  if(kind==='normal')return `<g><ellipse cx="${cx}" cy="${cy}" rx="44" ry="30" fill="#d9363e" stroke="#8f1d22" stroke-width="2"/><ellipse cx="${cx}" cy="${cy}" rx="20" ry="12" fill="#ef7a7f"/></g>`;
+  if(kind==='swollen')return `<g><circle cx="${cx}" cy="${cy}" r="42" fill="#e25a60" stroke="#8f1d22" stroke-width="2"/><path d="M${cx+22} ${cy-34} l6 10 l-8 6 l7 9" fill="none" stroke="#fff" stroke-width="3"/>${dots(7,cx+36,cx+62,cy-30,cy+10,'#d9363e',cx,3)}</g>`;
+  let p='';const n=14;for(let k=0;k<=n*2;k++){const a=k/(n*2)*Math.PI*2;const r=k%2?24:34;p+=(k?'L':'M')+(cx+Math.cos(a)*r*1.15).toFixed(1)+' '+(cy+Math.sin(a)*r*.85).toFixed(1)}
+  return `<g><path d="${p}Z" fill="#b1242c" stroke="#7a1419" stroke-width="2"/></g>`;
+}
+function arrow(x1,y1,x2,y2,c='#1e6fa8'){const a=Math.atan2(y2-y1,x2-x1),L=9;return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${c}" stroke-width="3"/><path d="M${x2} ${y2} L${(x2-L*Math.cos(a-.45)).toFixed(1)} ${(y2-L*Math.sin(a-.45)).toFixed(1)} L${(x2-L*Math.cos(a+.45)).toFixed(1)} ${(y2-L*Math.sin(a+.45)).toFixed(1)}Z" fill="${c}"/>`}
+
+/* ---------- Stationen ---------- */
+const ST=[
+/* ===== Teil 1: Wiederholung ===== */
+{id:'a1',part:1,title:'Begriffe auffrischen',afb:[1],mins:3,letter:'R',
+ story:'Der Obsthof Lindenblatt meldet Alarm: Für morgen ist Regen angesagt, und die Kirschen sind fast reif. Bevor ihr helft, prüft das Hof-Labor, ob ihr die Grundlagen aus der letzten Stunde noch beherrscht.',
+ body:()=>{const d={A:'Diffusion von Wasser durch eine Membran, die Wasser durchlässt, die gelösten Teilchen aber nicht.',B:'Unterschied in der Teilchenkonzentration zwischen zwei benachbarten Bereichen.',C:'Selbstständige Verteilung von Teilchen aufgrund ihrer Eigenbewegung, bis sie gleichmäßig verteilt sind.',D:'Trennschicht, die Wasser durchlässt, bestimmte gelöste Teilchen (z. B. Zucker, Salz) aber nicht.',E:'Ständige, ungerichtete Zitterbewegung kleiner Teilchen.'};
+  const t=['Diffusion','Brownsche Molekularbewegung','Konzentrationsgefälle','semipermeable Membran','Osmose'];
+  return `<div class="task"><div class="q"><span class="op">Ordne zu:</span> Wähle für jeden Begriff die passende Erklärung (A–E).</div>
+  <div class="deflist">${Object.entries(d).map(([k,v])=>`<div><b>${k}</b>${v}</div>`).join('')}</div>
+  ${t.map((x,i)=>`<div class="pair"><b>${x}</b>${sel(i,Object.keys(d).map(k=>[k,k]))}</div>`).join('')}</div>`},
+ n:5,
+ hints:['Fangt mit den Begriffen an, die ihr sicher kennt. „Semi“ heißt „halb“: Die Membran ist nur für einen Teil der Teilchen durchlässig.','Osmose ist ein Sonderfall der Diffusion: Es geht um Wasser und um eine Membran. Die Brownsche Bewegung ist der „Motor“ der Diffusion.'],
+ merke:'<b>Diffusion</b> ist die selbstständige Verteilung von Teilchen durch ihre Eigenbewegung. <b>Osmose</b> ist die Diffusion von <b>Wasser</b> durch eine <b>semipermeable Membran</b>.'
+},
+{id:'a2',part:1,title:'Richtig oder falsch?',afb:[1],mins:3,letter:'E',
+ story:'Im Hof-Labor hängt ein alter Merkzettel. Leider hat jemand Fehler hineingeschrieben.',
+ body:()=>{const st=['Bei der Diffusion wandern insgesamt mehr Teilchen vom Ort hoher zum Ort niedriger Konzentration.','Diffusion läuft bei höherer Temperatur schneller ab.','Für die Diffusion muss eine Zelle Energie aufwenden.','Sind die Teilchen gleichmäßig verteilt, hören sie auf, sich zu bewegen.','Diffusion gibt es auch in Gasen, z. B. wenn sich Parfümduft im Raum verteilt.','Bei der Osmose wandern die gelösten Zuckerteilchen durch die Membran.'];
+  return `<div class="task"><div class="q"><span class="op">Entscheide</span> für jede Aussage: richtig (R) oder falsch (F)?</div>
+  ${st.map((s,i)=>`<div class="tf"><span class="n">${i+1}</span><span>${s}</span>${seg(i,[['R','R'],['F','F']])}</div>`).join('')}</div>`},
+ n:6,
+ hints:['Diffusion ist ein passiver Vorgang: Die Bewegung der Teilchen kommt von ihrer Wärmeenergie, nicht von der Zelle.','Die Teilchen bewegen sich immer weiter, auch wenn sie gleichmäßig verteilt sind. Bei der Osmose wandert nur das Wasser durch die Membran.'],
+ merke:'Diffusion ist <b>passiv</b> und hört nie auf: Auch bei gleichmäßiger Verteilung bewegen sich die Teilchen weiter. Wärme beschleunigt sie.'
+},
+{id:'a3',part:1,title:'Wohin wandert das Wasser?',afb:[1],mins:3,letter:'G',
+ story:'Die Wasserleitungen im Labor haben Membranfenster. Orange Punkte sind gelöste Zuckerteilchen, blaue Punkte sind Wassermoleküle.',
+ body:()=>{const sc=[[4,12,'wenig Zucker','viel Zucker'],[9,9,'gleich viel Zucker','gleich viel Zucker'],[14,0,'viel Zucker','reines Wasser']];
+  return `<div class="task"><div class="q"><span class="op">Gib an</span>, in welche Richtung insgesamt mehr Wasser durch die Membran wandert.</div>
+  <div class="cols">${sc.map((s,i)=>`<div class="mcard"><b>Rohr ${i+1}</b><div class="svgbox">${chamber(i+1,s[0],s[1],s[2],s[3])}</div>${sel(i,[['L','mehr Wasser nach links'],['R','mehr Wasser nach rechts'],['N','gleich viel in beide Richtungen']])}</div>`).join('')}</div></div>`},
+ n:3,
+ hints:['Wasser wandert netto immer zu der Seite, auf der <b>mehr Teilchen gelöst</b> sind.','Sind auf beiden Seiten gleich viele Teilchen gelöst, wandern gleich viele Wassermoleküle hin und her.'],
+ merke:'Bei der Osmose wandert insgesamt mehr Wasser zur Seite mit der <b>höheren Konzentration gelöster Teilchen</b>.'
+},
+/* ===== Teil 2: Neu ===== */
+{id:'b1',part:2,title:'Hypo, hyper, iso: drei neue Wörter',afb:[1],mins:4,letter:'E',
+ story:'Ab jetzt wird es neu. Die Obstbäuerin Frau Lindenblatt hat euch einen Infozettel aus dem Hof-Labor hingelegt. Darauf stehen drei Fachwörter, die ihr ab jetzt braucht.',
+ info:()=>`<p>Die Wörter beschreiben eine Lösung <b>im Vergleich zum Zellinneren</b>. Das Zellinnere heißt <b>Cytoplasma</b> oder Zellplasma: eine wässrige Flüssigkeit, in der viele Stoffe gelöst sind. Entscheidend ist immer die <b>Konzentration</b>, also wie viele gelöste Teilchen sich in einem bestimmten Volumen befinden.</p>
+  <div><span class="word"><b>hypo</b> = unter, weniger</span><span class="word"><b>hyper</b> = über, mehr</span><span class="word"><b>iso</b> = gleich</span><span class="word"><b>tonos</b> = Spannung</span></div>
+  <div class="gloss"><div><b>hypotone Lösung</b>Die Konzentration gelöster Teilchen ist außen <u>niedriger</u> als in der Zelle.</div><div><b>isotone Lösung</b>Die Konzentration gelöster Teilchen ist außen <u>gleich</u> wie in der Zelle.</div><div><b>hypertone Lösung</b>Die Konzentration gelöster Teilchen ist außen <u>höher</u> als in der Zelle.</div><div><b>selektiv permeabel</b>Fachwort, das oft gleichbedeutend mit „semipermeabel“ verwendet wird: Die Membran lässt nur <u>bestimmte</u> Stoffe gut durch, z. B. Wasser.</div></div>`,
+ body:()=>{
+  const panel=(x,n,lab,dir,seed)=>{let a='';if(dir==='in')a=arrow(x+20,150,x+52,128);if(dir==='out')a=arrow(x+52,128,x+20,150,'#c2410c');if(dir==='both')a=arrow(x+18,148,x+50,128)+arrow(x+58,140,x+28,160,'#c2410c');
+   return `<rect x="${x}" y="40" width="170" height="170" rx="14" fill="#eef7fd" stroke="#8aa3b5" stroke-width="2"/>${dotsEx(n,x+8,x+162,48,202,'#f08a24',seed,x+95,118,52)}
+   <circle cx="${x+95}" cy="118" r="44" fill="#fde7e9" stroke="#b3122e" stroke-width="3" stroke-dasharray="6 4"/>${dots(6,x+70,x+120,92,144,'#f08a24',seed+50)}${a}
+   <text x="${x+85}" y="28" text-anchor="middle" font-size="16" font-weight="800" fill="#1f2a37">${lab}</text>`};
+  return `<div class="svgbox"><svg viewBox="0 0 580 250" role="img" aria-label="Zelle in drei Lösungen">
+   ${panel(10,5,'hypoton','in',3)}${panel(205,22,'isoton','both',9)}${panel(400,46,'hyperton','out',21)}
+   <text x="290" y="240" text-anchor="middle" font-size="13" fill="#5b6675">Rote Linie = Zelle · Gleich viele Punkte pro Fläche = gleiche Konzentration · Pfeile = Hauptrichtung des Wassers</text></svg></div>
+  <div class="task"><div class="q"><span class="op">Ordne zu:</span> Das Innere einer roten Blutzelle hat etwa dieselbe Konzentration gelöster Teilchen wie eine <b>0,9-prozentige Kochsalzlösung</b>. Ist die jeweilige Lösung im Vergleich dazu hypoton, isoton oder hyperton?</div>
+  ${['destilliertes Wasser (fast keine gelösten Stoffe)','5-prozentige Salzlösung','0,9-prozentige Salzlösung („physiologische Kochsalzlösung“)','Leitungswasser (sehr wenig gelöste Stoffe)','Meerwasser (etwa 3,5 % Salz)'].map((t,i)=>`<div class="pair"><span>${t}</span>${sel(i,TONI)}</div>`).join('')}</div>`},
+ n:5,
+ hints:['Vergleicht immer mit der Zelle (0,9 %). Niedrigere Konzentration → „hypo“ (unter). Höhere → „hyper“ (über). Gleiche → „iso“.','Destilliertes Wasser und Leitungswasser enthalten weniger gelöste Stoffe als die Zelle. Meerwasser enthält viel mehr.'],
+ merke:'<b>Hypoton</b>: Die Konzentration gelöster Teilchen ist außen niedriger als in der Zelle. <b>Isoton</b>: gleich hoch. <b>Hyperton</b>: außen höher. Der Vergleich bezieht sich immer auf das <b>Zellinnere</b>.'
+},
+{id:'b2',part:2,title:'Hin und her: der Nettostrom',afb:[1,2],mins:4,letter:'N',
+ story:'Frau Lindenblatt fragt: „Wenn Wasser durch die Membran in beide Richtungen wandert, warum wird die Zelle dann überhaupt dicker?“',
+ info:()=>`<p>Wassermoleküle wandern <b>immer in beide Richtungen</b> durch die Membran. Entscheidend ist der <b>Unterschied</b>:</p>
+  <div class="gloss"><div><b>Nettoeinstrom</b>Es wandern mehr Wassermoleküle <u>hinein</u> als hinaus. Volumen und Druck der Zelle steigen.</div><div><b>Nettoausstrom</b>Es wandern mehr Wassermoleküle <u>hinaus</u> als hinein. Volumen und Druck sinken.</div><div><b>Fließgleichgewicht</b>Es wandern <u>gleich viele</u> hinein wie hinaus. Das Wasser fließt weiter, aber Volumen und Druck der Zelle ändern sich nicht mehr. (Aus der letzten Stunde kennt ihr dafür das Wort „dynamisches Gleichgewicht“.)</div></div>
+  <p class="mini">Rechnung: Nettostrom = hinein − hinaus. „Netto“ kennt ihr vom Geld: Das, was am Ende übrig bleibt.</p>`,
+ body:()=>`<div class="svgbox"><canvas id="sim" width="640" height="230"></canvas>
+  <div class="row" style="justify-content:center;margin-top:8px"><button class="btn small ghost" data-mode="hypo">Zelle in hypotoner Lösung</button><button class="btn small ghost" data-mode="iso">isoton</button><button class="btn small ghost" data-mode="hyper">hyperton</button></div>
+  <div class="counter"><span>hinein: <b id="cIn">0</b></span><span>hinaus: <b id="cOut">0</b></span><span>netto: <b id="cNet">0</b></span></div>
+  <p class="mini">Modell: links außen, rechts die Zelle. Orange Teilchen können die Membran nicht passieren.</p></div>
+  <div class="task"><div class="q"><span class="op">Berechne</span> den Nettostrom und <span class="op">benenne</span> den Zustand. Die Werte sind Wassermoleküle pro Sekunde.</div>
+  <table class="calc"><tr><th></th><th>hinein</th><th>hinaus</th><th>Nettostrom</th><th>Zustand</th></tr>
+  ${[[30,18],[15,27],[22,22]].map((r,k)=>`<tr><th>Zelle ${k+1}</th><td>${r[0]}</td><td>${r[1]}</td><td>${num(k*2)}</td><td>${sel(k*2+1,[['ein','Nettoeinstrom'],['aus','Nettoausstrom'],['fg','Fließgleichgewicht']])}</td></tr>`).join('')}</table>
+  <p class="mini">Gebt den Nettostrom als Betrag an (ohne Minuszeichen).</p></div>
+  <div class="task"><div class="tf"><span class="n">!</span><span>Im Fließgleichgewicht wandern keine Wassermoleküle mehr durch die Membran.</span>${seg(6,[['R','richtig'],['F','falsch']])}</div></div>`,
+ init:root=>startSim(root),
+ n:7,
+ hints:['Rechnet „hinein minus hinaus“. Ist das Ergebnis 0, ist der Zustand ein Fließgleichgewicht.','Schaut in die Simulation bei „isoton“: Die Zähler laufen weiter, aber der Nettowert bleibt bei etwa 0.'],
+ merke:'Wasser wandert immer in beide Richtungen. Wandern mehr hinein als hinaus, gibt es einen <b>Nettoeinstrom</b>. Sind beide Ströme gleich groß, herrscht ein <b>Fließgleichgewicht</b>: Bewegung ja, Veränderung nein.'
+},
+{id:'b3',part:2,title:'Rote Blutzellen in Gefahr',afb:[1,2],mins:5,letter:'S',
+ story:'Ein Helfer auf dem Hof hat sich verletzt und bekommt im Krankenhaus eine Infusion. Warum fließt da eigentlich Salzwasser in die Vene und kein reines Wasser?',
+ info:()=>`<p><b>Erythrozyten</b> sind die roten Blutzellen. Sie haben <u>keine Zellwand</u>, nur eine dünne Zellmembran. Deshalb verändern sie ihre Form sofort, wenn Wasser ein- oder ausströmt. Strömt viel Wasser ein, können sie <b>platzen</b>.</p>
+  <p>Rote Blutzellen können kleine Schwankungen ausgleichen: In hypotoner Umgebung öffnen sie zusätzliche <b>Ionenkanäle</b> in ihrer Membran. Ionen (geladene Teilchen, z. B. Kalium-Ionen) strömen aus der Zelle hinaus. Dann ist die Konzentration gelöster Teilchen innen niedriger und es strömt weniger Wasser ein.</p>
+  <div class="gloss"><div><b>Homöostase</b>Fähigkeit, im Inneren von Zellen, Organen und Lebewesen <u>annähernd gleichbleibende</u> Bedingungen zu erhalten, auch wenn sich die Umgebung ändert. (griech. homoios = gleich, stasis = Stillstand)</div></div>`,
+ body:()=>`<div class="svgbox"><svg viewBox="0 0 600 180" role="img" aria-label="Drei rote Blutzellen">
+   ${eryth('shrunk',100,85)}${eryth('normal',300,85)}${eryth('swollen',490,85)}
+   <text x="100" y="165" text-anchor="middle" font-size="18" font-weight="800" fill="#1f2a37">X</text><text x="300" y="165" text-anchor="middle" font-size="18" font-weight="800" fill="#1f2a37">Y</text><text x="490" y="165" text-anchor="middle" font-size="18" font-weight="800" fill="#1f2a37">Z</text></svg></div>
+  <div class="task"><div class="q"><span class="op">Ordne zu:</span> In welcher Lösung lag jede Blutzelle?</div>
+  ${['X: geschrumpft, mit Zacken','Y: normale Scheibenform','Z: aufgebläht und geplatzt'].map((t,i)=>`<div class="pair"><span>${t}</span>${sel(i,TONI)}</div>`).join('')}</div>
+  <div class="task"><div class="q"><span class="op">Begründe:</span> Warum enthalten Infusionen 0,9-prozentige Kochsalzlösung und kein destilliertes Wasser?</div>
+  ${mc(3,[['A','Weil Salz dem Körper Energie liefert.'],['B','Weil die Lösung isoton zum Blut ist: Die Blutzellen nehmen netto kein Wasser auf und geben keines ab.'],['C','Weil destilliertes Wasser die Blutzellen schrumpfen lässt.']])}</div>
+  <div class="task"><div class="q">Was tut eine rote Blutzelle in einer leicht hypotonen Umgebung?</div>
+  ${mc(4,[['A','Sie pumpt Wasser aktiv aus der Zelle hinaus.'],['B','Sie nimmt zusätzlich Salz aus der Umgebung auf.'],['C','Sie lässt Ionen aus der Zelle strömen, sodass weniger Wasser einströmt.']])}</div>
+  <div class="task"><div class="q">Welche Aussage beschreibt Homöostase richtig?</div>
+  ${mc(5,[['A','Die Bedingungen im Inneren der Zelle verändern sich ständig mit der Umgebung.'],['B','Im Inneren von Zellen bleiben die Bedingungen annähernd gleich, auch wenn sich die Umgebung ändert.'],['C','Zellen können nur in einer hypotonen Umgebung überleben.']])}</div>`,
+ n:6,
+ hints:['Im hypotonen Medium strömt netto Wasser in die Zelle (sie wird dick). Im hypertonen strömt netto Wasser hinaus (sie schrumpft).','Die Zelle kann Wasser nicht gezielt hinauspumpen. Sie verändert stattdessen, wie viele Teilchen in ihr gelöst sind. Schaut in die Infokarte.'],
+ merke:'Rote Blutzellen haben keine Zellwand: In <b>hypotoner</b> Lösung schwellen sie an und platzen, in <b>hypertoner</b> schrumpfen sie. Sie brauchen eine <b>isotone</b> Umgebung. Das Aufrechterhalten gleichbleibender Bedingungen heißt <b>Homöostase</b>.'
+},
+{id:'b4',part:2,title:'Pflanzenzellen unter Druck',afb:[1,2],mins:5,letter:'C',
+ story:'In der Hitze lassen die Erdbeerpflanzen am Feldrand die Blätter hängen. Nach dem Gießen stehen sie wieder auf. Wie geht das?',
+ info:()=>`<p>Pflanzenzellen haben außerhalb der Zellmembran eine feste <b>Zellwand</b>. Innen liegt eine große <b>Vakuole</b> mit Zellsaft, in dem viele Stoffe gelöst sind. In hypotoner Lösung strömt Wasser vor allem in die Vakuole ein. Die Zellmembran wird fest an die Zellwand gedrückt, die gespannte Zellwand drückt dagegen. Irgendwann strömen gleich viele Wassermoleküle ein wie aus. Die Zellwand verhindert also, dass die Zelle platzt.</p>
+  <div class="gloss"><div><b>Turgor</b>Druck des Zellinhalts auf die Zellwand, entsteht durch das eingeströmte Wasser. Er spannt die Zellwände und macht weiche (krautige) Pflanzenteile fest.</div><div><b>Vergleich Fahrradreifen</b>Der Schlauch (Membran mit Vakuole) wird aufgepumpt und drückt gegen den festen Mantel (Zellwand). Ohne Luft ist der Reifen schlapp.</div></div>
+  <p class="mini">Wusstet ihr? Die Mimose klappt bei Berührung ihre Blättchen zusammen: Zellen in den Blattgelenken geben Wasser ab, der Turgor sinkt. Auch die Spaltöffnungen der Blätter öffnen und schließen sich, weil sich der Turgor ihrer Schließzellen ändert.</p>`,
+ body:()=>`<div class="svgbox"><svg viewBox="0 0 520 230" role="img" aria-label="Pflanzenzelle mit Nummern">
+   ${plantCell('turgor',130,20,260,190)}
+   <line x1="130" y1="60" x2="60" y2="40" stroke="#1f2a37" stroke-width="1.5"/><circle cx="48" cy="38" r="14" fill="#b3122e"/><text x="48" y="43" text-anchor="middle" fill="#fff" font-weight="800" font-size="15">1</text>
+   <line x1="137" y1="150" x2="60" y2="180" stroke="#1f2a37" stroke-width="1.5"/><circle cx="48" cy="184" r="14" fill="#b3122e"/><text x="48" y="189" text-anchor="middle" fill="#fff" font-weight="800" font-size="15">2</text>
+   <line x1="300" y1="110" x2="455" y2="110" stroke="#1f2a37" stroke-width="1.5"/><circle cx="468" cy="110" r="14" fill="#b3122e"/><text x="468" y="115" text-anchor="middle" fill="#fff" font-weight="800" font-size="15">3</text>
+   ${arrow(455,200,398,178,'#1e6fa8')}<text x="400" y="222" font-size="13" fill="#1e6fa8" font-weight="700">Wasser strömt ein</text>
+   </svg></div>
+  <div class="task"><div class="q"><span class="op">Benenne</span> die nummerierten Teile.</div>
+  ${[1,2,3].map((n,i)=>`<div class="pair"><b>${n}</b>${sel(i,[['kern','Zellkern'],['membran','Zellmembran'],['vakuole','Vakuole'],['wand','Zellwand']])}</div>`).join('')}</div>
+  <div class="task"><div class="q">Warum platzt eine Pflanzenzelle in hypotoner Lösung nicht, eine rote Blutzelle aber schon?</div>
+  ${mc(3,[['A','Pflanzenzellen haben keine Membran, deshalb strömt kein Wasser ein.'],['B','Die feste Zellwand hält dem Druck stand. Es strömen dann gleich viele Wassermoleküle ein wie aus.'],['C','Pflanzenzellen enthalten keine gelösten Stoffe.']])}</div>
+  <div class="task"><div class="q"><span class="op">Bringe in die richtige Reihenfolge:</span> Wie welkt eine Pflanze? (1 = zuerst)</div>
+  ${['Der Turgor nimmt ab, die Zellwände sind nicht mehr gespannt.','Die Pflanze bekommt zu wenig Wasser.','Blätter und Stängel werden schlaff, die Pflanze welkt.','Die Zellen verlieren Wasser, die Vakuolen werden kleiner.'].map((t,i)=>`<div class="pair"><span>${t}</span>${sel(4+i,[['1','1'],['2','2'],['3','3'],['4','4']])}</div>`).join('')}</div>`,
+ n:8,
+ hints:['Die Zellwand ist die äußerste, dicke braune Schicht. Direkt darunter liegt die dünne grüne Zellmembran. Der große Raum in der Mitte ist die Vakuole.','Beim Welken geht es vom Wassermangel (Ursache) über die Zelle bis zur ganzen Pflanze (Folge).'],
+ merke:'Der <b>Turgor</b> ist der Druck des Zellinhalts auf die <b>Zellwand</b>. Er macht krautige Pflanzen stabil. Bei Wassermangel sinkt der Turgor und die Pflanze <b>welkt</b>.'
+},
+{id:'b5',part:2,title:'Das Kirschen-Rätsel',afb:[2],mins:4,letter:'H',
+ story:'Jetzt könnt ihr die Frage von Frau Lindenblatt beantworten: Warum platzen reife Kirschen im Regen? Am Ende des Spiels gibt es noch einen Erklärtext für sie.',
+ info:()=>`<p>Reife Kirschen enthalten <b>sehr viel Zucker</b>, gelöst im Zellsaft der Fruchtzellen. Die Kirschhaut lässt Wasser durch, den gelösten Zucker aber nicht. Ein Regentropfen auf der Haut ist fast reines Wasser.</p>`,
+ body:()=>{let cells='';const R=rng(4);for(let r=0;r<4;r++)for(let c=0;c<5;c++){const x=172+c*36+(r%2)*18,y=88+r*30;if(Math.hypot(x+15-262,y+13-148)<92&&Math.hypot(x+16-262,y+13-150)>36)cells+=`<rect x="${x}" y="${y}" width="32" height="26" rx="7" fill="#f7b8c0" stroke="#c0394f"/>`+dots(4,x+5,x+27,y+5,y+21,'#f08a24',Math.floor(R()*999),2.4)}
+  return `<div class="svgbox"><svg viewBox="0 0 520 280" role="img" aria-label="Kirsche im Querschnitt mit Regentropfen">
+   <path d="M262 50 C 262 30, 275 12, 300 4" stroke="#5a7a2a" stroke-width="5" fill="none"/>
+   <circle cx="262" cy="150" r="104" fill="#fde2e6" stroke="#b3122e" stroke-width="10"/>${cells}
+   <ellipse cx="262" cy="150" rx="20" ry="26" fill="#e9d5b0" stroke="#a57c3b" stroke-width="2"/>
+   ${[[150,50],[380,60],[120,140],[405,150]].map(([x,y])=>`<path d="M${x} ${y} q -9 14 0 20 q 9 -6 0 -20Z" fill="#7cc3ea" stroke="#1e6fa8"/>`).join('')}
+   ${arrow(165,72,190,95)}${arrow(372,82,345,104)}
+   <text x="20" y="250" font-size="13" fill="#1e6fa8" font-weight="700">Regentropfen</text><text x="380" y="250" font-size="13" fill="#b3122e" font-weight="700">Kirschhaut</text>
+   <text x="262" y="275" text-anchor="middle" font-size="12" fill="#5b6675">Orange Punkte: gelöster Zucker in den Fruchtzellen</text></svg></div>
+  <div class="task"><div class="q">Das Regenwasser auf der Kirschhaut ist im Vergleich zum Zellsaft der Fruchtzellen …</div>${sel(0,TONI)}</div>
+  <div class="task"><div class="q"><span class="op">Bringe die Erklärung in die richtige Reihenfolge</span> (1 = zuerst).</div>
+  ${['Volumen und Druck in den Fruchtzellen steigen.','Regenwasser bleibt als dünner Film auf der Kirschhaut liegen.','Die Haut kann sich nicht weiter dehnen und reißt auf.','Im Zellsaft ist viel Zucker gelöst, das Regenwasser ist hypoton.','Wasser diffundiert durch die Haut in die Fruchtzellen: Es kommt zum Nettoeinstrom.'].map((t,i)=>`<div class="pair"><span>${t}</span>${sel(1+i,[['1','1'],['2','2'],['3','3'],['4','4'],['5','5']])}</div>`).join('')}</div>
+  <div class="task"><div class="q">Welche Maßnahme schützt die Ernte am besten?</div>
+  ${mc(6,[['A','Die Bäume bei Regen zusätzlich gießen.'],['B','Die Kirschen nach dem Regen mit destilliertem Wasser abspülen.'],['C','Folien-Dächer über die Bäume spannen, damit kein Regen auf die Früchte fällt.']])}</div>`},
+ n:7,
+ hints:['Vergleicht: Im Zellsaft ist viel Zucker, im Regenwasser fast nichts. Wie heißt eine Außenlösung mit niedrigerer Konzentration als in der Zelle?','Die Kette geht von außen nach innen und zurück: Regen auf der Haut → Vergleich der Konzentrationen → Wasser strömt ein → Druck steigt → Haut reißt.'],
+ merke:'Regenwasser ist <b>hypoton</b> zum zuckerreichen Zellsaft der Kirsche. Durch <b>Nettoeinstrom</b> von Wasser steigen Volumen und Druck in den Fruchtzellen, bis die Haut <b>reißt</b>. Obstbauern schützen ihre Bäume deshalb mit <b>Regendächern</b>.'
+},
+/* ===== Teil 3: Experiment vorbereiten ===== */
+{id:'c1',part:3,title:'Versuch 1: Kartoffelstäbchen',afb:[2],mins:3,letter:'U',
+ story:'In der nächsten Stunde forscht ihr selbst. Frau Lindenblatt will wissen, ob man die Osmose auch an Pflanzengewebe messen kann. Ihr plant dafür einen Versuch mit Kartoffelstäbchen.',
+ info:()=>`<p><b>Versuchsidee:</b> Gleich große Kartoffelstäbchen (ca. 1 cm × 1 cm × 5 cm) werden gewogen und 30 Minuten in zwei Bechergläser gelegt. Danach werden sie abgetupft und erneut gewogen. Außerdem prüft ihr, wie fest oder biegsam sie sind.</p>
+  <p class="mini">Eine <b>Hypothese</b> ist eine begründete Vermutung, die man mit einem Versuch überprüfen kann.</p>`,
+ body:()=>{const beaker=(x,lab,n,seed)=>`<path d="M${x} 40 v130 a10 10 0 0 0 10 10 h110 a10 10 0 0 0 10 -10 v-130" fill="#eef7fd" stroke="#5b6675" stroke-width="3"/>${dots(n,x+8,x+122,70,172,'#9aa5b1',seed,3)}<rect x="${x+40}" y="60" width="50" height="16" rx="3" fill="#f4e3a1" stroke="#b08a2e" stroke-width="2" transform="rotate(-20 ${x+65} 68)"/><text x="${x+65}" y="205" text-anchor="middle" font-size="15" font-weight="800" fill="#1f2a37">${lab}</text>`;
+  return `<div class="svgbox"><svg viewBox="0 0 400 215" role="img" aria-label="Zwei Bechergläser mit Kartoffelstäbchen">${beaker(40,'A: destilliertes Wasser',0,1)}${beaker(230,'B: 10-prozentige Salzlösung',30,7)}</svg></div>
+  <div class="task"><div class="q"><span class="op">Stellt Hypothesen auf:</span> Was erwartet ihr nach 30 Minuten?</div>
+  <table class="calc"><tr><th></th><th>Becher A: dest. Wasser</th><th>Becher B: 10 % Salz</th></tr>
+  <tr><th>Die Lösung ist im Vergleich zu den Kartoffelzellen …</th><td>${sel(0,TONI)}</td><td>${sel(3,TONI)}</td></tr>
+  <tr><th>Masse des Stäbchens</th><td>${sel(1,[['zu','nimmt zu'],['ab','nimmt ab'],['gleich','bleibt gleich']])}</td><td>${sel(4,[['zu','nimmt zu'],['ab','nimmt ab'],['gleich','bleibt gleich']])}</td></tr>
+  <tr><th>Festigkeit</th><td>${sel(2,[['fester','fester, knackig'],['weicher','weicher, biegsam'],['gleich','unverändert']])}</td><td>${sel(5,[['fester','fester, knackig'],['weicher','weicher, biegsam'],['gleich','unverändert']])}</td></tr></table></div>`},
+ n:6,
+ hints:['Kartoffelzellen enthalten gelöste Stoffe. Destilliertes Wasser enthält fast keine, die Salzlösung sehr viele.','Strömt netto Wasser in die Zellen, steigt der Turgor: Das Stäbchen wird schwerer und fester. Strömt netto Wasser hinaus, wird es leichter und biegsam.'],
+ merke:'Unsere Hypothesen: In <b>destilliertem Wasser</b> (hypoton) nehmen die Stäbchen Wasser auf und werden <b>schwerer und fester</b>. In <b>10-prozentiger Salzlösung</b> (hyperton) geben sie Wasser ab und werden <b>leichter und biegsam</b>.'
+},
+{id:'c2',part:3,title:'Ein fairer Versuch',afb:[2],mins:3,letter:'T',
+ story:'Damit ihr am Ende sicher sagen könnt, dass nur die Lösung den Unterschied macht, muss der Versuch fair sein.',
+ info:()=>`<div class="gloss"><div><b>Was wir verändern</b>Nur eine Sache wird absichtlich verändert (unabhängige Variable).</div><div><b>Was wir messen</b>Das Ergebnis, das wir beobachten oder messen (abhängige Variable).</div><div><b>Was wir gleich halten</b>Alles andere bleibt bei beiden Bechern gleich. Sonst wissen wir nicht, was die Ursache war.</div></div>`,
+ body:()=>`<div class="task"><div class="q"><span class="op">Ordne zu:</span> Welche Rolle spielt jede Größe im Kartoffelversuch?</div>
+  ${['Liegedauer in der Lösung','Masse der Stäbchen vor und nach dem Versuch','Größe der Stäbchen','Salzkonzentration der Lösung','Menge der Flüssigkeit im Becher','Temperatur im Raum'].map((t,i)=>`<div class="pair"><span>${t}</span>${sel(i,[['v','wird verändert'],['m','wird gemessen'],['k','wird gleich gehalten']])}</div>`).join('')}</div>`,
+ n:6,
+ hints:['Es gibt genau eine Größe, die ihr verändert, und genau eine, die ihr messt.','Ihr wollt herausfinden, wie die Lösung wirkt. Also verändert ihr die Lösung und messt, was mit den Stäbchen passiert.'],
+ merke:'Verändert wird nur die <b>Salzkonzentration</b>. Gemessen wird die <b>Masse</b>. Größe, Liegedauer, Flüssigkeitsmenge und Temperatur bleiben <b>gleich</b>.'
+},
+{id:'c3',part:3,title:'Versuch 2: Zwiebelzellen unter dem Mikroskop',afb:[2],mins:4,letter:'Z',
+ story:'Im zweiten Versuch schaut ihr direkt in die Zellen: Ihr mikroskopiert die Haut einer roten Küchenzwiebel. Ihr Zellsaft ist rot-violett gefärbt, deshalb sieht man die Vakuole gut.',
+ info:()=>`<p>Liegt eine Pflanzenzelle in einer <b>hypertonen</b> Lösung, verliert sie Wasser. Die Vakuole schrumpft, und die Zellmembran <b>löst sich</b> mit dem Zellinhalt <b>von der Zellwand</b>. Diesen Vorgang nennt man <b>Plasmolyse</b>. Die Zellwand selbst ist für Wasser und Salz durchlässig und behält ihre Form.</p>
+  <p class="mini">So geht es: Präparat mit Wasser anfertigen, dann am Rand des Deckgläschens Salzlösung auftropfen und auf der anderen Seite mit Filterpapier durchsaugen.</p>`,
+ body:()=>`<div class="svgbox micros">${micro('Bild P','plasmo')}${micro('Bild Q','turgor')}${micro('Bild R','burst')}</div>
+  <div class="task"><div class="q"><span class="op">Sagt voraus:</span> Welches Bild erwartet ihr?</div>
+  <div class="pair"><span>Zwiebelhaut in destilliertem Wasser</span>${sel(1,[['P','Bild P'],['Q','Bild Q'],['R','Bild R']])}</div>
+  <div class="pair"><span>Zwiebelhaut nach Zugabe von Salzlösung</span>${sel(0,[['P','Bild P'],['Q','Bild Q'],['R','Bild R']])}</div></div>
+  <div class="task"><div class="q">Was befindet sich bei der Plasmolyse im Raum zwischen Zellwand und Zellmembran?</div>
+  ${mc(2,[['A','Luft'],['B','Salzlösung von außen, denn die Zellwand ist durchlässig'],['C','Zellsaft aus der Vakuole']])}</div>
+  <div class="task"><div class="q">Was erwartet ihr, wenn ihr danach wieder destilliertes Wasser durchsaugt?</div>
+  ${mc(3,[['A','Die Vakuole nimmt wieder Wasser auf, die Zellmembran legt sich wieder an die Zellwand.'],['B','Nichts, die Plasmolyse ist endgültig.'],['C','Die Zellen platzen, weil die Zellwand reißt.']])}</div>`,
+ n:4,
+ hints:['Bild R zeigt zerrissene Zellwände. Das passiert bei Pflanzenzellen durch Osmose nicht, weil die Wand stabil ist.','Die Zellwand hat große Poren wie ein Netz. Was von außen kommt, kann hindurch, aber nicht durch die Zellmembran.'],
+ merke:'In hypertoner Lösung löst sich die Zellmembran von der Zellwand: <b>Plasmolyse</b>. Im Zwischenraum befindet sich die <b>Außenlösung</b>. Gibt man wieder Wasser zu, dehnt sich die Vakuole wieder aus (<b>Deplasmolyse</b>).'
+}
+];
+const CODE=ST.map(s=>s.letter).join('');
+
+/* ---------- Simulation (Station b2) ---------- */
+let simRAF=null;
+function startSim(root){
+  const cv=$('#sim',root);if(!cv)return;const ctx=cv.getContext('2d');const W=cv.width,H=cv.height,M=W/2;
+  const solOut={hypo:4,iso:12,hyper:26},rate={hypo:[3,1],iso:[2,2],hyper:[1,3]};
+  let mode='hypo',inC=0,outC=0,parts=[],t=0;
+  function setup(){parts=[];const R=rng(3);
+    for(let k=0;k<70;k++)parts.push({x:R()*(M-20)+5,y:R()*(H-10)+5,w:1});for(let k=0;k<70;k++)parts.push({x:M+15+R()*(M-20),y:R()*(H-10)+5,w:1});
+    for(let k=0;k<solOut[mode];k++)parts.push({x:R()*(M-20)+5,y:R()*(H-10)+5,w:0});for(let k=0;k<12;k++)parts.push({x:M+15+R()*(M-20),y:R()*(H-10)+5,w:0});
+    inC=0;outC=0;upd()}
+  function upd(){$('#cIn',root).textContent=inC;$('#cOut',root).textContent=outC;$('#cNet',root).textContent=(inC-outC>0?'+':'')+(inC-outC)+(inC-outC>0?' (hinein)':inC-outC<0?' (hinaus)':'')}
+  function cross(dir){const side=dir>0?parts.filter(p=>p.w&&p.x<M-10):parts.filter(p=>p.w&&p.x>M+10);if(!side.length)return;
+    const p=side[Math.floor(Math.random()*side.length)];p.tx=dir>0?M+30+Math.random()*(M-60):30+Math.random()*(M-60);p.ty=p.y;p.hl=40;
+    if(dir>0)inC++;else outC++;upd()}
+  function step(){t++;
+    if(t%30===0){const [a,b]=rate[mode];for(let k=0;k<a;k++)cross(1);for(let k=0;k<b;k++)cross(-1)}
+    ctx.clearRect(0,0,W,H);ctx.fillStyle='#eef7fd';ctx.fillRect(0,0,M,H);ctx.fillStyle='#fde7e9';ctx.fillRect(M,0,M,H);
+    ctx.strokeStyle='#b3122e';ctx.lineWidth=4;ctx.setLineDash([10,7]);ctx.beginPath();ctx.moveTo(M,0);ctx.lineTo(M,H);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle='#1f2a37';ctx.font='bold 14px sans-serif';ctx.fillText('außen',10,18);ctx.fillText('Zelle',M+10,18);
+    for(const p of parts){
+      if(p.tx!=null){p.x+=(p.tx-p.x)*.08;p.y+=Math.sin(t/5)*.5;if(Math.abs(p.tx-p.x)<1)p.tx=null;if(p.hl)p.hl--}
+      else{p.x+=(Math.random()-.5)*2.2;p.y+=(Math.random()-.5)*2.2;
+        const lo=p.x<M?4:M+6,hi=p.x<M?M-6:W-4;p.x=Math.min(hi,Math.max(lo,p.x));p.y=Math.min(H-4,Math.max(4,p.y))}
+      ctx.beginPath();ctx.arc(p.x,p.y,p.w?3.2:5.5,0,7);ctx.fillStyle=p.w?(p.hl?'#1e6fa8':'#7cc3ea'):'#f08a24';ctx.fill()}
+    if(document.body.contains(cv))simRAF=requestAnimationFrame(step)}
+  $$('[data-mode]',root).forEach(b=>b.onclick=()=>{mode=b.dataset.mode;$$('[data-mode]',root).forEach(x=>x.classList.toggle('btn',true));$$('[data-mode]',root).forEach(x=>x.classList.toggle('ghost',x!==b));setup()});
+  $$('[data-mode]',root)[0].classList.remove('ghost');
+  if(simRAF)cancelAnimationFrame(simRAF);setup();step();
+}
+
+/* ---------- Ansichten ---------- */
+const PARTS={1:'Teil 1 · Wiederholung',2:'Teil 2 · Neu',3:'Teil 3 · Experiment vorbereiten'};
+function hud(){
+  $('#slots').innerHTML=ST.map((s,i)=>`<span class="slot ${S.solved[s.id]?'got':''} ${i===S.cur&&!S.finished?'cur':''} ${i>0&&ST[i-1].part!==s.part?'gap':''}" title="${esc(s.title)}">${S.solved[s.id]?s.letter:'?'}</span>`).join('');
+  $('#team').textContent=S.team?'Team '+S.team:'';
+}
+function tick(){
+  const el=$('#timer');if(!S.started){el.textContent='45:00';return}
+  const end=S.finished||Date.now();let left=TOTAL_MIN*60-Math.floor((end-S.started)/1000);
+  const neg=left<0;left=Math.abs(left);el.textContent=(neg?'+':'')+String(Math.floor(left/60)).padStart(2,'0')+':'+String(left%60).padStart(2,'0');
+  el.classList.toggle('low',!neg&&left<300);el.classList.toggle('over',neg);
+}
+setInterval(tick,1000);
+
+function render(){
+  hud();tick();const v=$('#view');
+  if(!S.started){v.innerHTML=startView();wireStart();return}
+  if(S.cur>=ST.length){v.innerHTML=codeView();wireCode();return}
+  v.innerHTML=stationView(ST[S.cur]);wireStation(ST[S.cur]);window.scrollTo(0,0);
+}
+function startView(){
+  return `<div class="hero"><div class="kicker">Biologie · Jahrgang 10 · Escape-Spiel 2</div><h1>Mission Kirschernte</h1>
+  <p class="muted">Warum platzen reife Kirschen im Regen? Helft dem Obsthof Lindenblatt, bevor der Regen kommt.</p></div>
+  <div class="card"><div class="story">Morgen soll es regnen. Letztes Jahr ist dabei die halbe Kirschernte aufgeplatzt. Frau Lindenblatt braucht ein Forschungsteam, das das Rätsel löst und einen Versuch plant, mit dem man es beweisen kann.</div>
+  <h3 style="margin-top:16px">So läuft die Mission</h3>
+  <div class="plan"><div><b>Teil 1 · Wiederholung</b>3 Stationen, ca. 9 Minuten. Das kennt ihr schon.</div><div><b>Teil 2 · Neu</b>5 Stationen, ca. 22 Minuten. Infokarten und Bilder helfen euch.</div><div><b>Teil 3 · Experiment</b>3 Stationen, ca. 10 Minuten. Ihr plant die Versuche für die nächste Stunde.</div></div>
+  <p>Jede gelöste Station verrät einen Buchstaben. Zusammen ergeben sie das Lösungswort. Bei Problemen helfen zwei Tipps pro Station. Tipps kosten nichts, sie werden nur gezählt.</p>
+  <p class="mini">Ihr braucht: ein Heft für Notizen. Arbeitet zu zweit an einem Gerät.</p>
+  <div class="row"><input type="text" id="teamIn" placeholder="Eure Namen" maxlength="60" style="flex:1;min-width:200px"><button class="btn" id="go">Mission starten</button></div></div>`;
+}
+function wireStart(){const go=$('#go'),inp=$('#teamIn');go.onclick=()=>{S.team=inp.value.trim().slice(0,60);S.started=Date.now();save();render()};inp.onkeydown=e=>{if(e.key==='Enter')go.click()}}
+
+function stationView(s){
+  const i=ST.indexOf(s),solved=!!S.solved[s.id],hu=S.hints[s.id]||0;
+  const bridge=(i>0&&ST[i-1].part!==s.part)?`<div class="card bridge"><h3>${PARTS[s.part]}</h3>${s.part===2?'<p>Ab hier ist der Inhalt <b>neu</b>. Lest zuerst die Infokarte und schaut euch die Bilder genau an. Dann löst ihr die Aufgaben.</p>':'<p>Jetzt bereitet ihr die Versuche für die <b>nächste Stunde</b> vor. Eure Antworten landen am Ende auf eurem Versuchsplan.</p>'}</div>`:'';
+  return `${bridge}<div class="card" data-st="${s.id}">
+   <div class="row"><span class="part">${PARTS[s.part]}</span>${s.afb.map(a=>`<span class="tag afb${a}">AFB ${['','I','II','III'][a]}</span>`).join('')}<span class="mini">ca. ${s.mins} min · Station ${i+1} von ${ST.length}</span></div>
+   <h2>${s.title}</h2><div class="story">${s.story}</div>
+   ${s.info?`<details class="info" open><summary>Infokarte</summary>${s.info()}</details>`:''}
+   ${s.body()}
+   <div class="row noprint" style="margin-top:14px"><button class="btn" id="chk" ${solved?'hidden':''}>Prüfen</button>
+    <button class="btn hint small" id="hintBtn" ${solved||hu>=s.hints.length?'hidden':''}>💡 Tipp ${hu+1} von ${s.hints.length}</button></div>
+   <div id="hints">${s.hints.slice(0,hu).map((t,k)=>`<div class="hintbox"><b>Tipp ${k+1}:</b> ${t}</div>`).join('')}</div>
+   <div class="feedback" id="fb"></div>
+   <div id="after">${solved?afterHTML(s):''}</div></div>`;
+}
+function afterHTML(s){
+  const last=ST.indexOf(s)===ST.length-1;
+  return `<div class="merke"><h4>✔ Merke</h4>${s.merke}</div>
+  <div class="row" style="margin-top:14px"><span class="letter">${s.letter}</span><span>Buchstabe ${ST.indexOf(s)+1} für das Lösungswort.</span><span class="sp"></span><button class="btn" id="next">${last?'Zum Lösungswort':'Weiter'} →</button></div>`;
+}
+function wireStation(s){
+  const root=$(`[data-st="${s.id}"]`);
+  $$('.seg',root).forEach(sg=>$$('button',sg).forEach(b=>b.onclick=()=>{sg.dataset.val=b.dataset.v;$$('button',sg).forEach(x=>x.classList.toggle('on',x===b));remember()}));
+  const vals=S.vals[s.id]||[];vals.forEach((v,i)=>setVal(root,i,v));
+  function remember(){S.vals[s.id]=Array.from({length:s.n},(_,i)=>getVal(root,i));save()}
+  root.addEventListener('change',remember);root.addEventListener('input',remember);
+  if(s.init)s.init(root);
+  const fb=$('#fb',root),chk=$('#chk',root);
+  if(S.solved[s.id]){disable(root);wireAfter(s,root)}
+  chk.onclick=()=>{
+    const lk=S.lock[s.id]||0;if(Date.now()<lk){showFb(fb,'no',`Kurz durchatmen: Noch ${Math.ceil((lk-Date.now())/1000)} Sekunden, dann könnt ihr wieder prüfen. Nutzt die Zeit für die Infokarte oder einen Tipp.`);return}
+    const v=Array.from({length:s.n},(_,i)=>getVal(root,i));
+    if(v.some(x=>x===''||x==='x')){showFb(fb,'no','Es fehlen noch Antworten. Füllt alle Felder aus.');return}
+    let ok=0;v.forEach((x,i)=>{if(h(s.id+'|'+i+'|'+x)===KEYS[s.id][i])ok++});
+    if(ok===s.n){S.solved[s.id]=true;save();hud();showFb(fb,'ok','Richtig! Alle Antworten stimmen.');chk.hidden=true;$('#hintBtn',root).hidden=true;$('#after',root).innerHTML=afterHTML(s);disable(root);wireAfter(s,root);$('#after',root).scrollIntoView({behavior:'smooth',block:'center'})}
+    else{S.fails[s.id]=(S.fails[s.id]||0)+1;let msg=`${ok} von ${s.n} Antworten stimmen. Überprüft die anderen noch einmal.`;
+      if(S.fails[s.id]%3===0){S.lock[s.id]=Date.now()+20000;msg+=' Bevor ihr wieder prüft, lest bitte noch einmal die Infokarte oder nehmt einen Tipp (20 Sekunden Pause).'}
+      save();showFb(fb,'no',msg)}
+  };
+  $('#hintBtn',root).onclick=()=>{S.hints[s.id]=(S.hints[s.id]||0)+1;save();const k=S.hints[s.id];
+    $('#hints',root).insertAdjacentHTML('beforeend',`<div class="hintbox"><b>Tipp ${k}:</b> ${s.hints[k-1]}</div>`);
+    const b=$('#hintBtn',root);if(k>=s.hints.length)b.hidden=true;else b.textContent=`💡 Tipp ${k+1} von ${s.hints.length}`};
+}
+function disable(root){$$('select,input',root).forEach(e=>e.disabled=true);$$('.seg button',root).forEach(e=>e.disabled=true)}
+function wireAfter(s,root){const n=$('#next',root);if(n)n.onclick=()=>{S.cur=ST.indexOf(s)+1;save();render()}}
+function showFb(el,cls,msg){el.className='feedback show '+cls;el.textContent=msg}
+
+function codeView(){
+  if(S.finished)return finalView();
+  return `<div class="card"><h2>Das Lösungswort</h2><div class="story">Ihr habt alle Stationen geschafft. Setzt die Buchstaben zusammen und gebt das Lösungswort ein. Es verrät, wie Frau Lindenblatt ihre Kirschen morgen rettet.</div>
+  <p style="font-size:28px;letter-spacing:.3em;font-weight:800;text-align:center;color:var(--cherry)">${ST.map(s=>S.solved[s.id]?s.letter:'_').join('')}</p>
+  <div class="row"><input type="text" id="codeIn" placeholder="Lösungswort" style="flex:1;text-transform:uppercase"><button class="btn" id="codeGo">Freischalten</button></div><div class="feedback" id="fb"></div></div>`;
+}
+function wireCode(){
+  if(S.finished){wireFinal();return}
+  const go=$('#codeGo'),inp=$('#codeIn');
+  go.onclick=()=>{if(inp.value.trim().toUpperCase().replace(/\s/g,'')===CODE){S.finished=Date.now();save();render()}else showFb($('#fb'),'no','Das passt noch nicht. Schaut euch die Buchstaben in der Kopfleiste an.')};
+  inp.onkeydown=e=>{if(e.key==='Enter')go.click()};
+}
+function finalView(){
+  const mins=Math.round((S.finished-S.started)/60000),hints=Object.values(S.hints).reduce((a,b)=>a+b,0);
+  const c1=S.vals.c1||[],c3=S.vals.c3||[];
+  const L={hypo:'hypoton',iso:'isoton',hyper:'hyperton',zu:'nimmt zu',ab:'nimmt ab',gleich:'bleibt gleich',fester:'wird fester',weicher:'wird weicher, biegsam'};
+  const g=x=>L[x]||x||'…';
+  return `<div class="card noprint"><h2>🍒 Mission erfüllt: REGENSCHUTZ!</h2>
+  <div class="story">Frau Lindenblatt spannt heute Abend die Regendächer über die Bäume. Dank euch weiß sie jetzt auch, warum: Regenwasser ist hypoton zum zuckerreichen Zellsaft, und der Nettoeinstrom lässt die Kirschen platzen.</div>
+  <p>Zeit: <b>${mins} Minuten</b> · genutzte Tipps: <b>${hints}</b></p>
+  <div class="lab"><h3>Euer Erklärtext für Frau Lindenblatt <span class="tag afb2">AFB II</span></h3>
+  <p>Erklärt in 3 bis 4 Sätzen und mit den Fachwörtern <i>hypoton, Osmose, Nettoeinstrom, Druck</i>, warum reife Kirschen im Regen platzen.</p>
+  <textarea id="note" placeholder="Schreibt in ganzen Sätzen …">${esc(S.notes.kirsche||'')}</textarea>
+  <div class="row" style="margin-top:6px"><span class="mini" id="cnt"></span><span class="sp"></span><button class="btn ghost small" id="cmp">Mit Musterlösung vergleichen</button></div>
+  <div class="model" id="model" ${S.compared.kirsche?'':'hidden'}><b>Musterlösung:</b> Im Zellsaft reifer Kirschen ist sehr viel Zucker gelöst. Das Regenwasser auf der Haut enthält fast keine gelösten Stoffe und ist deshalb hypoton. Durch Osmose diffundieren mehr Wassermoleküle in die Fruchtzellen hinein als hinaus, es kommt zu einem Nettoeinstrom. Volumen und Druck in den Zellen steigen, bis die Haut der Kirsche reißt.</div></div>
+  <div class="row" style="margin-top:16px"><button class="btn" onclick="window.print()">🖨 Versuchsplan drucken</button><span class="mini">Oder ins Heft übertragen. Den Plan braucht ihr in der nächsten Stunde.</span></div></div>
+  <div class="card printable sheet">
+   <h2>Unser Versuchsplan für die nächste Stunde</h2><p>Team: <b>${esc(S.team||'…………………')}</b></p>
+   <h3>Forschungsfrage</h3><p>Wie wirken hypotone und hypertone Lösungen auf Pflanzenzellen?</p>
+   <h3>Versuch 1: Kartoffelstäbchen</h3>
+   <table><tr><th></th><th>Becher A: destilliertes Wasser</th><th>Becher B: 10-prozentige Salzlösung</th></tr>
+   <tr><th>Die Lösung ist …</th><td>${g(c1[0])}</td><td>${g(c1[3])}</td></tr>
+   <tr><th>Hypothese Masse</th><td>${g(c1[1])}</td><td>${g(c1[4])}</td></tr>
+   <tr><th>Hypothese Festigkeit</th><td>${g(c1[2])}</td><td>${g(c1[5])}</td></tr></table>
+   <p><b>Material:</b> Kartoffel, Messer, Lineal, Schneidebrett, 2 Bechergläser, destilliertes Wasser, 10-prozentige Kochsalzlösung, Waage (0,01 g), Küchenpapier, Uhr.</p>
+   <p><b>Durchführung:</b> 1. Zwei gleich große Stäbchen (1 cm × 1 cm × 5 cm) schneiden. 2. Abtupfen, wiegen, Masse notieren. 3. Je ein Stäbchen in Becher A und B legen, 30 Minuten warten. 4. Herausnehmen, abtupfen, erneut wiegen. 5. Festigkeit durch vorsichtiges Biegen prüfen.</p>
+   <p><b>Fairer Versuch:</b> Verändert wird nur die Salzkonzentration. Gemessen wird die Masse. Gleich bleiben Größe, Liegedauer, Flüssigkeitsmenge und Temperatur.</p>
+   <table class="blank"><tr><th>Becher</th><th>Masse vorher (g)</th><th>Masse nachher (g)</th><th>Änderung (g)</th><th>Festigkeit</th></tr><tr><td>A</td><td></td><td></td><td></td><td></td></tr><tr><td>B</td><td></td><td></td><td></td><td></td></tr></table>
+   <h3>Versuch 2: Rote Zwiebelhaut unter dem Mikroskop</h3>
+   <div class="pics">${micro('Bild P','plasmo')}${micro('Bild Q','turgor')}</div>
+   <p><b>Hypothese:</b> In destilliertem Wasser sehen die Zellen aus wie Bild ${esc(c3[1]||'…')}, nach Zugabe von Salzlösung wie Bild ${esc(c3[0]||'…')}. Die Zellmembran löst sich dann von der Zellwand (Plasmolyse). Nach erneuter Wasserzugabe legt sie sich wieder an (Deplasmolyse).</p>
+   <p><b>Durchführung:</b> 1. Ein Stück rote Zwiebelhaut in einem Wassertropfen auf den Objektträger legen, Deckgläschen auflegen. 2. Bei mittlerer Vergrößerung zeichnen. 3. Salzlösung an den Rand tropfen und mit Filterpapier durchsaugen. 4. Nach 3 bis 5 Minuten erneut zeichnen. 5. Destilliertes Wasser durchsaugen und beobachten.</p>
+   <table><tr><th>Zeichnung: in Wasser</th><th>Zeichnung: in Salzlösung</th></tr><tr><td><div class="draw"></div></td><td><div class="draw"></div></td></tr></table>
+  </div>`;
+}
+function wireFinal(){
+  const t=$('#note'),c=$('#cnt'),b=$('#cmp');if(!t)return;
+  const upd=()=>{const n=t.value.trim().length;c.textContent=n<120?`noch ${120-n} Zeichen bis zum Vergleich`:'✓ genug geschrieben';b.disabled=n<120};
+  t.oninput=()=>{S.notes.kirsche=t.value;save();upd()};upd();
+  b.onclick=()=>{S.compared.kirsche=true;save();$('#model').hidden=false};
+}
+
+/* ---------- Lehrkraft ---------- */
+function teacher(){
+  const c=prompt('Code für die Lehrkraft:');if(c==null)return;
+  if(h(c.trim().toUpperCase())!==TEACH_HASH){alert('Falscher Code.');return}
+  const html=decodeURIComponent(escape(atob(TEACH_DATA)));
+  const v=$('#view');v.innerHTML=`<div class="card"><div class="row"><h2 style="flex:1;margin:0">Lehrkraft-Ansicht</h2><button class="btn ghost small" id="back">Zurück zum Spiel</button></div>
+   <div class="row" style="margin:10px 0"><span class="mini">Zu Station springen (für Vorführung oder Neustart einer Gruppe):</span>${sel('jump',ST.map((s,i)=>[String(i),(i+1)+' '+s.title]))}<button class="btn small" id="jumpGo">Springen</button></div>${html}</div>`;
+  $('#back').onclick=render;
+  $('#jumpGo').onclick=()=>{const i=parseInt($('[data-i="jump"]').value);if(isNaN(i))return;if(!S.started)S.started=Date.now();for(let k=0;k<i;k++)S.solved[ST[k].id]=true;S.cur=i;save();render()};
+}
+$('#teachBtn').onclick=teacher;
+$('#resetBtn').onclick=()=>{if(confirm('Wirklich alles löschen und neu beginnen?')){S=fresh();save();render()}};
+render();
+</script>
+</body>
+</html>
